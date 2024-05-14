@@ -1,3 +1,23 @@
+/* HOME  */
+.p-home h1 {
+  text-align: center;
+}
+
+.p-home .meuble-container {
+  background-color: #f5f5f5;
+  border: 1px solid #ccc;
+  padding: 10px;
+  margin-bottom: 20px;
+}
+
+.p-home .meuble-materiaux {
+  list-style-type: none;
+}
+
+.p-home .meuble-materiaux li {
+  margin-left: 20px;
+}
+
 /* HEADER */
 header {
   background-color: #7b6b43;
