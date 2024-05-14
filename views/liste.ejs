@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Liste des Meubles</title>
+</head>
+<header>
+  <a href="/login"><img src="/path/to/your/icon.png" alt="Login"></a>
+</header>
+<body>
+  <h1>Liste des Meubles</h1>
+  <ul>
+    <% meubles.forEach((meuble) => { %>
+      <li>
+        <strong>Nom du Meuble:</strong> <%= meuble.NomMeuble %><br>
+        <strong>Matériaux Utilisés:</strong><br>
+        <ul>
+          <% meuble.materiaux.forEach((materiau) => { %>
+            <li><%= materiau.NomMatiere %> - Quantité: <%= materiau.Quantite %></li>
+          <% }); %>
+        </ul>
+      </li>
+    <% }); %>
+  </ul>
+</body>
+</html>
