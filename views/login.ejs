@@ -5,16 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
     <link rel="stylesheet" href="/public/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
 <body>
+    <header>
+        <a href="/login"><i class="fa-regular fa-user"></i>Connexion</a>
+        <a href="/"><img src="/path/to/your/home-icon.png" alt="Accueil"></a>
+    </header>
     <section class="login-container">
         <div>
             <h1>Identification</h1>
-        
-        <header>
-            <a href="/login"><img src="/path/to/your/icon.png" alt="Login"></a>
-        </header>
-    
         <form action="/login" method="post">
             <label for="username">Nom d'utilisateur :</label>
             <input type="text" id="username" name="username" required><br>
