@@ -1,11 +1,10 @@
 import express from "express";
 import mysql from "mysql2/promise";
-import fs from "fs";
-import * as meubleController from "./controllers/meubleController.js";
+import cookieParser from "cookie-parser";
 import meubles from "./routes/meubles.js";
 import { fileURLToPath } from "url";
-import { dirname } from "path"; // Importez 'dirname' depuis le module 'path'
-import path from "path"; // Ajoutez cette ligne pour importer 'path'
+import { dirname } from "path";
+import path from "path"; // Assurez-vous que cette ligne est présente pour importer 'path'
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -25,14 +24,21 @@ const pool = await mysql.createPool({
   queueLimit: 0,
 });
 
+// utilisation des templates EJS
+app.set("views", "./views");
 app.set("view engine", "ejs");
-app.set("views", path.join(__dirname, "views"));
+app.set("view options", { pretty: true });
 
+app.use(express.urlencoded({ extended: true }));
 app.use("/public", express.static(path.join(__dirname, "public")));
+app.use(express.json());
+app.use(cookieParser());
 
+// appel du routeur
 app.use("/", meubles);
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Serveur démarré sur le port ${PORT}`);
+app.listen(port, () => {
+  console.log(`Serveur démarré sur le port ${port}`);
 });
+
+export { pool };

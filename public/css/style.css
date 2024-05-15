@@ -75,6 +75,7 @@ section.login-container form {
 
 form input[type="password"],
 form input[type="text"],
+form input[type="email"],
 form button[type="submit"] {
   width: 90%;
 
@@ -91,6 +92,8 @@ form button[type="submit"] {
 
 form input[type="text"]:focus,
 form input[type="text"]:hover,
+form input[type="email"]:focus,
+form input[type="email"]:hover,
 form input[type="password"]:focus,
 form input[type="password"]:hover {
   background-color: #ccc;
