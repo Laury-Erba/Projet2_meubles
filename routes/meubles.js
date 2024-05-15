@@ -1,33 +1,20 @@
 import express from "express";
 import * as meubleController from "../controllers/meubleController.js";
 import * as adminController from "../controllers/adminController.js";
+import AuthJWT from "../middleware/auth.js"; // Assurez-vous que AuthJWT est correctement importé
+
 const router = express.Router();
 
-//middleware
-import AuthJWT from "../middleware/auth.js";
-
-// la route pour la page de Liste des meubles
+// Route pour afficher la liste des meubles
 router.get("/", meubleController.afficherListeMeubles);
 
-//ADMIN PAGE
-router.get("/admin", AuthJWT);
-
-router.get("/signup", (req, res) => {
-  res.render("signup");
-});
-
-router.post("/signup", meubleController.signup);
-
-// Route pour afficher le formulaire de connexion
+// Route pour afficher la page de login
 router.get("/login", meubleController.renderLoginPage);
 
 // Route pour gérer la connexion
 router.post("/login", meubleController.login);
 
-// Route pour afficher la liste des meubles
-router.get("/", adminController.afficherListeMeubles);
-
-// Route pour afficher les détails d'un meuble
-router.get("/:id", adminController.afficherDetailsMeuble);
+// Route pour afficher la page d'administration
+router.get("/admin", AuthJWT, adminController.renderAdminPage);
 
 export default router;

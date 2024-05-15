@@ -11,6 +11,10 @@ const pool = mysql.createPool({
   connectionLimit: 100,
   queueLimit: 0,
 });
+// Fonction pour afficher la page d'administration
+export const renderAdminPage = (req, res) => {
+  res.render("admin", {});
+};
 
 // Action pour afficher la liste des meubles
 export const afficherListeMeubles = async (req, res) => {
