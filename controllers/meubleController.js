@@ -45,7 +45,7 @@ export const afficherListeMeubles = async (req, res) => {
   }
 };
 
-// fonction pour afficher la page de login
+// Fonction pour afficher la page de login
 export const renderLoginPage = (req, res) => {
   res.render("login", { error: null });
 };
@@ -54,14 +54,12 @@ export const renderLoginPage = (req, res) => {
 export const login = (req, res, next) => {
   const { email, password } = req.body;
 
-  // Vérifiez les champs email et mot de passe
   if (!email || !password) {
     return res.render("login", {
       error: "Veuillez saisir un email et un mot de passe.",
     });
   }
 
-  // Requête MySQL pour récupérer l'utilisateur avec l'email spécifié
   pool.query("SELECT * FROM Users WHERE email = ?", [email], (err, results) => {
     if (err) {
       console.error(
@@ -71,12 +69,10 @@ export const login = (req, res, next) => {
       return res.render("login", { error: "Erreur interne du serveur." });
     }
 
-    // Vérifiez si l'utilisateur existe
     if (results.length === 0) {
       return res.render("login", { error: "Email ou mot de passe incorrect." });
     }
 
-    // Vérifiez le mot de passe en utilisant bcrypt
     bcrypt.compare(password, results[0].password, (bcryptErr, bcryptResult) => {
       if (bcryptErr) {
         console.error(
@@ -92,13 +88,11 @@ export const login = (req, res, next) => {
         });
       }
 
-      // Générez un token JWT pour l'authentification
       const token = jwt.sign({ userId: results[0].id }, "votre_secret_jwt", {
         expiresIn: "1h",
       });
       res.cookie("token", token, { maxAge: 3600000, httpOnly: true });
 
-      // Redirection vers le tableau de bord ou une autre page
       res.redirect("/admin");
     });
   });

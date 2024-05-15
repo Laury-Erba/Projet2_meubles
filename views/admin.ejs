@@ -16,11 +16,12 @@
 <body>
     <h1>Admin Dashboard</h1>
     <section class="material-container">
-        <h2>Matériaux Utilisés</h2>
-        <ul id="material-list">
-            <!-- Les éléments de la liste seront ajoutés dynamiquement ici -->
-        </ul>
+      <h2>Liste des Meubles</h2>
+      <ul>
+          <% meubles.forEach(meuble => { %>
+              <li><a href="/meubles/<%= meuble.id %>"><%= meuble.nom %></a></li>
+          <% }) %>
+      </ul>
     </section>
-    <footer>
-        <!-- Ajoutez votre pied de page ici -->
-    </footer>
+  </body>
+  </html>

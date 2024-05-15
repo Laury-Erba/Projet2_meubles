@@ -1,5 +1,6 @@
 import express from "express";
 import * as meubleController from "../controllers/meubleController.js";
+import * as adminController from "../controllers/adminController.js";
 const router = express.Router();
 
 //middleware
@@ -22,5 +23,11 @@ router.get("/login", meubleController.renderLoginPage);
 
 // Route pour gérer la connexion
 router.post("/login", meubleController.login);
+
+// Route pour afficher la liste des meubles
+router.get("/", adminController.afficherListeMeubles);
+
+// Route pour afficher les détails d'un meuble
+router.get("/:id", adminController.afficherDetailsMeuble);
 
 export default router;
