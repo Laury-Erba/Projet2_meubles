@@ -11,35 +11,47 @@ const pool = mysql.createPool({
   connectionLimit: 100,
   queueLimit: 0,
 });
-// Fonction pour afficher la page d'administration
-export const renderAdminPage = (req, res) => {
-  res.render("admin", {});
+
+// Définissez la fonction renderAdminPage
+export const renderAdminPage = async (req, res) => {
+  try {
+    const meubles = await afficherListeMeubles(req, res);
+    res.render("admin", { meubles });
+  } catch (error) {
+    console.error("Erreur lors du rendu de la page d'administration :", error);
+    res.status(500).send("Erreur serveur");
+  }
 };
 
-// Action pour afficher la liste des meubles
+// Fonction pour afficher la liste des meubles avec les matériaux utilisés et les entreprises fournissant les matériaux
 export const afficherListeMeubles = async (req, res) => {
   try {
     const query = `
-        SELECT Meubles.Nom AS NomMeuble, Materiaux.Nom AS NomMatiere, MeubleMateriaux.Quantite
+        SELECT Meubles.Nom AS NomMeuble, Materiaux.Nom AS NomMatiere, MeubleMateriaux.Quantite, Entreprises.Nom AS NomEntreprise
         FROM Meubles
         JOIN MeubleMateriaux ON Meubles.IdMeuble = MeubleMateriaux.IdMeuble
         JOIN Materiaux ON MeubleMateriaux.IdMatiere = Materiaux.IdMatiere
+        JOIN Entreprises ON MeubleMateriaux.IdEntreprise = Entreprises.IdEntreprise
       `;
     const [rows] = await pool.query(query);
 
     const meubles = {};
     rows.forEach((row) => {
-      const { NomMeuble, NomMatiere, Quantite } = row;
+      const { NomMeuble, NomMatiere, Quantite, NomEntreprise } = row;
       if (!meubles[NomMeuble]) {
         meubles[NomMeuble] = {
           NomMeuble,
           materiaux: [],
         };
       }
-      meubles[NomMeuble].materiaux.push({ NomMatiere, Quantite });
+      meubles[NomMeuble].materiaux.push({
+        NomMatiere,
+        Quantite,
+        NomEntreprise,
+      });
     });
 
-    res.render("liste", { meubles: Object.values(meubles) });
+    res.render("admin", { meubles: Object.values(meubles) });
   } catch (error) {
     console.error(
       "Erreur lors de la récupération de la liste des meubles :",
@@ -49,33 +61,19 @@ export const afficherListeMeubles = async (req, res) => {
   }
 };
 
-// Fonction pour afficher la page de détails d'un meuble
-export const afficherDetailsMeuble = async (req, res) => {
+// Fonction pour supprimer un meuble
+export const deleteMeuble = async (req, res) => {
   const { id } = req.params;
   try {
-    const query = `
-        SELECT Meubles.Nom AS NomMeuble, Materiaux.Nom AS NomMatiere, MeubleMateriaux.Quantite
-        FROM Meubles
-        JOIN MeubleMateriaux ON Meubles.IdMeuble = MeubleMateriaux.IdMeuble
-        JOIN Materiaux ON MeubleMateriaux.IdMatiere = Materiaux.IdMatiere
-        WHERE Meubles.IdMeuble = ?
-      `;
-    const [rows] = await pool.query(query, [id]);
+    // Supprimer le meuble en fonction de l'identifiant
+    const connection = await pool.getConnection();
+    await connection.execute("DELETE FROM Meubles WHERE IdMeuble = ?", [id]);
+    connection.release();
 
-    const meuble = {
-      NomMeuble: rows[0].NomMeuble,
-      materiaux: rows.map((row) => ({
-        NomMatiere: row.NomMatiere,
-        Quantite: row.Quantite,
-      })),
-    };
-
-    res.render("details", { meuble });
+    // Rediriger vers la page admin après la suppression
+    res.redirect("/admin");
   } catch (error) {
-    console.error(
-      "Erreur lors de la récupération des détails du meuble :",
-      error
-    );
+    console.error("Erreur lors de la suppression du meuble :", error);
     res.status(500).send("Erreur serveur");
   }
 };

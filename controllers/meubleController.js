@@ -45,13 +45,11 @@ export const afficherListeMeubles = async (req, res) => {
   }
 };
 
-// Fonction pour afficher la page de login
 export const renderLoginPage = (req, res) => {
   res.render("login", { error: null });
 };
 
-// Fonction pour gérer la connexion
-export const login = (req, res, next) => {
+export const login = (req, res) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
@@ -93,17 +91,15 @@ export const login = (req, res, next) => {
       });
       res.cookie("token", token, { maxAge: 3600000, httpOnly: true });
 
+      console.log("Redirection vers /admin");
       res.redirect("/admin");
     });
   });
 };
 
-// Fonction pour afficher le formulaire d'inscription
 export const getSignupPage = (req, res) => {
   res.render("signup", { error: null });
 };
-
-// Fonction pour gérer l'inscription
 
 export const signup = async (req, res) => {
   try {
@@ -116,9 +112,11 @@ export const signup = async (req, res) => {
       return res.render("signup", { error: "L'email est déjà utilisé." });
     }
 
+    const hashedPassword = await bcrypt.hash(password, 10);
+
     await pool.query("INSERT INTO Users (email, password) VALUES (?, ?)", [
       email,
-      password,
+      hashedPassword,
     ]);
     res.redirect("/login");
   } catch (error) {

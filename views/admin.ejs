@@ -16,12 +16,26 @@
 <body>
     <h1>Admin Dashboard</h1>
     <section class="material-container">
-      <h2>Liste des Meubles</h2>
+     
+      <h2>Liste des meubles :</h2>
       <ul>
-          <% meubles.forEach(meuble => { %>
-              <li><a href="/meubles/<%= meuble.id %>"><%= meuble.nom %></a></li>
-          <% }) %>
+        <% meubles.forEach(meuble => { %>
+          <li>
+            <%= meuble.NomMeuble %>
+            <!-- Bouton de suppression -->
+            <ul>
+              <% meuble.materiaux.forEach(material => { %>
+                <li><%= material.NomMatiere %> (fourni par <%= material.NomEntreprise %>) - Quantité: <%= material.Quantite %></li>
+              <% }) %>
+            </ul>
+             <form action="/meubles/admin/delete/<%= meuble.id %>" method="post">
+        <button type="submit">Supprimer</button>
+      </form>
+          </li>
+        <% }) %>
       </ul>
+      
+
     </section>
   </body>
   </html>
