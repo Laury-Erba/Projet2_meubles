@@ -29,6 +29,6 @@ router.get("/signup", getSignupPage);
 router.post("/signup", signup);
 
 // Route pour supprimer un meuble
-router.post("/admin/delete/:id", adminController.deleteMeuble);
+router.get("/admin/delete/:id", adminController.deleteMeuble);
 
 export default router;

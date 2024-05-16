@@ -7,35 +7,84 @@
     <link rel="stylesheet" href="/public/css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="/public/css/style.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link href="node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
 <header>
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512H418.3c16.4 0 29.7-13.3 29.7-29.7C448 383.8 368.2 304 269.7 304H178.3z"/></svg><a href="/login">Connexion</a>
   <a href="/signup">Inscription</a>
+ 
 </header>
 <body>
-    <h1>Admin Dashboard</h1>
-    <section class="material-container">
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+      <a class="navbar-brand" href="#">Admin Dashboard</a>
+      <!-- Ajoutez ici d'autres liens de navigation si nécessaire -->
+    </div>
+  </nav>
+  <div class="container mt-4">
+    <h1>Statistiques</h1>
+    <div class="row">
+      <div class="col-md-6">
+        <canvas id="myChart"></canvas>
+      </div>
+      <!-- Ajoutez ici d'autres graphiques ou éléments de statistiques si nécessaire -->
+    </div>
+  </div>
+    <section class="material-container container mt-4">
      
       <h2>Liste des meubles :</h2>
       <ul>
         <% meubles.forEach(meuble => { %>
           <li>
             <%= meuble.NomMeuble %>
-            <!-- Bouton de suppression -->
+          
             <ul>
               <% meuble.materiaux.forEach(material => { %>
                 <li><%= material.NomMatiere %> (fourni par <%= material.NomEntreprise %>) - Quantité: <%= material.Quantite %></li>
               <% }) %>
             </ul>
-             <form action="/meubles/admin/delete/<%= meuble.id %>" method="post">
-        <button type="submit">Supprimer</button>
-      </form>
+            <a href="/meubles/admin/delete/<%= meuble.id %>" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce meuble ?')">Supprimer</a>
           </li>
         <% }) %>
       </ul>
-      
-
     </section>
+    <script src="path/to/chartjs/chart.min.js"></script>
+<script src="path/to/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+  // Récupérez le contexte du canvas
+  var ctx = document.getElementById('myChart').getContext('2d');
+
+  // Définir les données du graphique
+  var data = {
+    labels: ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin'],
+    datasets: [{
+      label: 'Ventes mensuelles',
+      data: [65, 59, 80, 81, 56, 55],
+      backgroundColor: 'rgba(75, 192, 192, 0.2)',
+      borderColor: 'rgba(75, 192, 192, 1)',
+      borderWidth: 1
+    }]
+  };
+
+  // Définir les options du graphique
+  var options = {
+    scales: {
+      y: {
+        beginAtZero: true
+      }
+    }
+  };
+
+  // Créer un nouveau graphique avec Chart.js
+  var myChart = new Chart(ctx, {
+    type: 'bar',
+    data: data,
+    options: options
+  });
+</script>
+
   </body>
   </html>

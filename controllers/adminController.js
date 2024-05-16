@@ -1,5 +1,4 @@
 import mysql from "mysql2/promise";
-import Chart from "chart.js/auto";
 
 const pool = mysql.createPool({
   host: "localhost",
@@ -12,7 +11,6 @@ const pool = mysql.createPool({
   queueLimit: 0,
 });
 
-// Définissez la fonction renderAdminPage
 export const renderAdminPage = async (req, res) => {
   try {
     const meubles = await afficherListeMeubles(req, res);
@@ -61,19 +59,15 @@ export const afficherListeMeubles = async (req, res) => {
   }
 };
 
-// Fonction pour supprimer un meuble
-export const deleteMeuble = async (req, res) => {
-  const { id } = req.params;
-  try {
-    // Supprimer le meuble en fonction de l'identifiant
-    const connection = await pool.getConnection();
-    await connection.execute("DELETE FROM Meubles WHERE IdMeuble = ?", [id]);
-    connection.release();
+export const deleteMeuble = (req, res) => {
+  //on récupère l'id de l'article à supprimer, il a été passé en paramètre de l'url
+  let id = req.params.id;
 
-    // Rediriger vers la page admin après la suppression
+  // requete de suppresion en BDD
+  let sql = "DELETE FROM Meubles WHERE id = ?";
+
+  pool.query(sql, [id], function (error, result, fields) {
+    // redirection vers admin une fois effectué
     res.redirect("/admin");
-  } catch (error) {
-    console.error("Erreur lors de la suppression du meuble :", error);
-    res.status(500).send("Erreur serveur");
-  }
+  });
 };
