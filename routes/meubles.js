@@ -6,7 +6,13 @@ import {
   getSignupPage,
   signup,
 } from "../controllers/meubleController.js";
-import * as adminController from "../controllers/adminController.js";
+
+import {
+  renderAdminPage,
+  getMeubleDetailsByCategory,
+  deleteMeuble,
+} from "../controllers/adminController.js";
+
 import AuthJWT from "../middleware/auth.js";
 
 const router = express.Router();
@@ -20,15 +26,14 @@ router.get("/login", renderLoginPage);
 // Route pour gérer la connexion
 router.post("/login", login);
 
-// Route pour afficher la page d'administration
-router.get("/admin", adminController.renderAdminPage);
 // Route pour afficher le formulaire d'inscription
 router.get("/signup", getSignupPage);
 
 // Route pour gérer l'inscription
 router.post("/signup", signup);
 
-// Route pour supprimer un meuble
-router.get("/admin/delete/:id", adminController.deleteMeuble);
+router.get("/admin", renderAdminPage);
+router.get("/admin/categorie/:idCategorie", getMeubleDetailsByCategory);
+router.get("/admin/delete/:id", deleteMeuble);
 
 export default router;

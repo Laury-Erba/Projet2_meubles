@@ -3,50 +3,61 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Détails du Meuble</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>Détails des Meubles</title>
+    <link rel="stylesheet" href="/public/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/5.1.3/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-    <h1>Détails du Meuble : <%= meuble.NomMeuble %></h1>
-    <h2>Matériaux :</h2>
-    <ul>
-        <% meuble.materiaux.forEach(mat => { %>
-            <li><%= mat.NomMatiere %> - Quantité : <%= mat.Quantite %></li>
-        <% }) %>
-    </ul>
-    <canvas id="myChart"></canvas>
-    <script>
-        var ctx = document.getElementById('myChart').getContext('2d');
-        var myChart = new Chart(ctx, {
-            type: 'pie',
-            data: {
-                labels: [<% meuble.materiaux.forEach(mat => { %>"<%= mat.NomMatiere %>",<% }) %>],
-                datasets: [{
-                    label: 'Matériaux Utilisés',
-                    data: [<% meuble.materiaux.forEach(mat => { %><%= mat.Quantite %>,<% }) %>],
-                    backgroundColor: [
-                        'rgba(255, 99, 132, 0.2)',
-                        'rgba(54, 162, 235, 0.2)',
-                        'rgba(255, 206, 86, 0.2)',
-                        'rgba(75, 192, 192, 0.2)',
-                        'rgba(153, 102, 255, 0.2)',
-                        'rgba(255, 159, 64, 0.2)'
-                    ],
-                    borderColor: [
-                        'rgba(255, 99, 132, 1)',
-                        'rgba(54, 162, 235, 1)',
-                        'rgba(255, 206, 86, 1)',
-                        'rgba(75, 192, 192, 1)',
-                        'rgba(153, 102, 255, 1)',
-                        'rgba(255, 159, 64, 1)'
-                    ],
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                // Ajoutez ici les options du graphique, si nécessaire
-            }
-        });
-    </script>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">Admin Dashboard</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin">Accueil</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <h1>Détails des Meubles pour la Catégorie: <%= categories.find(c => c.IdCategorie == selectedCategory).NomCategorie %></h1>
+        
+        <div class="mt-4">
+            <h2>Filtres par catégorie :</h2>
+            <ul class="list-inline">
+                <% categories.forEach(category => { %>
+                    <li class="list-inline-item">
+                        <a href="/admin/categorie/<%= category.IdCategorie %>" class="btn btn-primary"><%= category.NomCategorie %></a>
+                    </li>
+                <% }) %>
+            </ul>
+        </div>
+
+        <div class="mt-4">
+            <h2>Liste des meubles :</h2>
+            <ul class="list-group">
+                <% meubles.forEach(meuble => { %>
+                    <li class="list-group-item">
+                        <h3><%= meuble.NomMeuble %> (<%= meuble.NomCategorie %>)</h3>
+                        <ul>
+                            <% meuble.materiaux.forEach(material => { %>
+                                <li><%= material.NomMatiere %> (fourni par <%= material.NomEntreprise %>) - Quantité: <%= material.Quantite %></li>
+                            <% }) %>
+                        </ul>
+                        <a href="/admin/delete/<%= meuble.id %>" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce meuble ?')" class="btn btn-danger">Supprimer</a>
+                    </li>
+                <% }) %>
+            </ul>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.1.3/js/bootstrap.min.js"></script>
 </body>
 </html>

@@ -2,9 +2,12 @@ import express from "express";
 import mysql from "mysql2/promise";
 import cookieParser from "cookie-parser";
 import session from "express-session";
+
 import meubles from "./routes/meubles.js";
+
 import { fileURLToPath } from "url";
 import { dirname } from "path";
+
 import bodyParser from "body-parser";
 import path from "path"; // Assurez-vous que cette ligne est présente pour importer 'path'
 

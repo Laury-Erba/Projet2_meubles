@@ -126,3 +126,61 @@ export const signup = async (req, res) => {
     });
   }
 };
+// function pour gérer les mots clefs
+export const getMeubleDetailsByKeyword = async (req, res) => {
+  const keyword = req.params.keyword;
+
+  try {
+    const query = `
+      SELECT Meubles.Nom AS NomMeuble, Materiaux.Nom AS NomMatiere, MeubleMateriaux.Quantite, Entreprises.Nom AS NomEntreprise
+      FROM Meubles
+      JOIN MeubleMateriaux ON Meubles.IdMeuble = MeubleMateriaux.IdMeuble
+      JOIN Materiaux ON MeubleMateriaux.IdMatiere = Materiaux.IdMatiere
+      JOIN Entreprises ON MeubleMateriaux.IdEntreprise = Entreprises.IdEntreprise
+      WHERE Materiaux.MotsCles LIKE ?
+    `;
+    const [rows] = await pool.query(query, [`%${keyword}%`]);
+
+    res.render("keywordDetails", { keyword, details: rows });
+  } catch (error) {
+    console.error(
+      "Erreur lors de la récupération des détails par mot-clé :",
+      error
+    );
+    res.status(500).send("Erreur serveur");
+  }
+};
+export const renderAdminPage = async (req, res) => {
+  try {
+    const query = `
+      SELECT Meubles.Nom AS NomMeuble, Materiaux.Nom AS NomMatiere, MeubleMateriaux.Quantite, Entreprises.Nom AS NomEntreprise, Materiaux.MotsCles
+      FROM Meubles
+      JOIN MeubleMateriaux ON Meubles.IdMeuble = MeubleMateriaux.IdMeuble
+      JOIN Materiaux ON MeubleMateriaux.IdMatiere = Materiaux.IdMatiere
+      JOIN Entreprises ON MeubleMateriaux.IdEntreprise = Entreprises.IdEntreprise
+    `;
+    const [rows] = await pool.query(query);
+
+    const meubles = {};
+    rows.forEach((row) => {
+      const { NomMeuble, NomMatiere, Quantite, NomEntreprise, MotsCles } = row;
+      if (!meubles[NomMeuble]) {
+        meubles[NomMeuble] = {
+          NomMeuble,
+          materiaux: [],
+        };
+      }
+      meubles[NomMeuble].materiaux.push({
+        NomMatiere,
+        Quantite,
+        NomEntreprise,
+        motsCles: MotsCles.split(",").map((motCle) => motCle.trim()), // Assuming keywords are comma-separated
+      });
+    });
+
+    res.render("admin", { meubles: Object.values(meubles) });
+  } catch (error) {
+    console.error("Erreur lors du rendu de la page d'administration :", error);
+    res.status(500).send("Erreur serveur");
+  }
+};

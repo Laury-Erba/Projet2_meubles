@@ -13,46 +13,92 @@ const pool = mysql.createPool({
 
 export const renderAdminPage = async (req, res) => {
   try {
-    const meubles = await afficherListeMeubles(req, res);
-    res.render("admin", { meubles });
+    const meubles = await afficherListeMeubles();
+    const categories = await getCategories();
+    res.render("admin", { meubles, categories });
   } catch (error) {
     console.error("Erreur lors du rendu de la page d'administration :", error);
     res.status(500).send("Erreur serveur");
   }
 };
 
-// Fonction pour afficher la liste des meubles avec les matériaux utilisés et les entreprises fournissant les matériaux
-export const afficherListeMeubles = async (req, res) => {
+export const afficherListeMeubles = async (idCategorie = null) => {
   try {
-    const query = `
-        SELECT Meubles.Nom AS NomMeuble, Materiaux.Nom AS NomMatiere, MeubleMateriaux.Quantite, Entreprises.Nom AS NomEntreprise
-        FROM Meubles
-        JOIN MeubleMateriaux ON Meubles.IdMeuble = MeubleMateriaux.IdMeuble
-        JOIN Materiaux ON MeubleMateriaux.IdMatiere = Materiaux.IdMatiere
-        JOIN Entreprises ON MeubleMateriaux.IdEntreprise = Entreprises.IdEntreprise
-      `;
-    const [rows] = await pool.query(query);
+    let query = `
+      SELECT Meubles.IdMeuble, Meubles.Nom AS NomMeuble, Materiaux.Nom AS NomMatiere, MeubleMateriaux.Quantite, Entreprises.Nom AS NomEntreprise, Categories.Nom AS NomCategorie
+      FROM Meubles
+      JOIN MeubleMateriaux ON Meubles.IdMeuble = MeubleMateriaux.IdMeuble
+      JOIN Materiaux ON MeubleMateriaux.IdMatiere = Materiaux.IdMatiere
+      JOIN Entreprises ON MeubleMateriaux.IdEntreprise = Entreprises.IdEntreprise
+      JOIN Categories ON Meubles.IdCategorie = Categories.IdCategorie
+    `;
+    const params = [];
+    if (idCategorie) {
+      query += ` WHERE Categories.IdCategorie = ?`;
+      params.push(idCategorie);
+    }
+    const [rows] = await pool.query(query, params);
 
     const meubles = {};
     rows.forEach((row) => {
-      const { NomMeuble, NomMatiere, Quantite, NomEntreprise } = row;
-      if (!meubles[NomMeuble]) {
-        meubles[NomMeuble] = {
+      const {
+        IdMeuble,
+        NomMeuble,
+        NomMatiere,
+        Quantite,
+        NomEntreprise,
+        NomCategorie,
+      } = row;
+      if (!meubles[IdMeuble]) {
+        meubles[IdMeuble] = {
+          id: IdMeuble,
           NomMeuble,
+          NomCategorie,
           materiaux: [],
         };
       }
-      meubles[NomMeuble].materiaux.push({
+      meubles[IdMeuble].materiaux.push({
         NomMatiere,
         Quantite,
         NomEntreprise,
       });
     });
 
-    res.render("admin", { meubles: Object.values(meubles) });
+    return Object.values(meubles);
   } catch (error) {
     console.error(
       "Erreur lors de la récupération de la liste des meubles :",
+      error
+    );
+    throw new Error("Erreur serveur");
+  }
+};
+
+export const getCategories = async () => {
+  try {
+    const query = `SELECT IdCategorie, Nom AS NomCategorie FROM Categories`;
+    const [rows] = await pool.query(query);
+    return rows;
+  } catch (error) {
+    console.error("Erreur lors de la récupération des catégories :", error);
+    throw new Error("Erreur serveur");
+  }
+};
+
+export const getMeubleDetailsByCategory = async (req, res) => {
+  const idCategorie = req.params.idCategorie;
+
+  try {
+    const meubles = await afficherListeMeubles(idCategorie);
+    const categories = await getCategories();
+    res.render("meubleDetails", {
+      meubles,
+      categories,
+      selectedCategory: idCategorie,
+    });
+  } catch (error) {
+    console.error(
+      "Erreur lors de la récupération des meubles par catégorie :",
       error
     );
     res.status(500).send("Erreur serveur");
@@ -60,14 +106,14 @@ export const afficherListeMeubles = async (req, res) => {
 };
 
 export const deleteMeuble = (req, res) => {
-  //on récupère l'id de l'article à supprimer, il a été passé en paramètre de l'url
-  let id = req.params.id;
+  const id = req.params.id;
 
-  // requete de suppresion en BDD
-  let sql = "DELETE FROM Meubles WHERE id = ?";
-
+  const sql = "DELETE FROM Meubles WHERE IdMeuble = ?";
   pool.query(sql, [id], function (error, result, fields) {
-    // redirection vers admin une fois effectué
+    if (error) {
+      console.error("Erreur lors de la suppression du meuble :", error);
+      return res.status(500).send("Erreur serveur");
+    }
     res.redirect("/admin");
   });
 };
